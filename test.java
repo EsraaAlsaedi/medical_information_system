@@ -29,9 +29,15 @@ public class test {
 		Appointment appointment_1 = new Appointment(2324);
 		Appointment appointment_2 = new Appointment(9668);
 
+		appointment_2.addAppintment("Thursday 8 June 2023 11:59PM");
+		System.out.println(appointment_1.toString());
+		
 		Nurse nurse_1 = new Nurse("Nurse Abeer", "From 9AM to 5PM");
 		Nurse nurse_2 = new Nurse("Nurse Khaled", "From 5PM to 9AM");
 
+		nurse_2.setPassword("%^&*(300");
+		System.out.println(nurse_1.toString());
+		
 		Doctor[] doctorObjects = new Doctor[5];
 		doctorObjects[0] = new Doctor("dr.Sara", 2234, "Eyes");
 		doctorObjects[1] = new Doctor("dr.Ahmad", 1234, "Dental");
