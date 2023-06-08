@@ -1,16 +1,27 @@
 package test;
 
+import java.io.*;
 import java.util.*;
 
 public class test {
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws Exception {
 
 		Hospital hospital_1 = new Hospital("New Hope Care");
 		Hospital hospital_2 = new Hospital("Urgent Care Medical");
 
-		Doctor doctor_1 = new Doctor("dr.Sara", 12345, "Eyes");
-		Doctor doctor_2 = new Doctor("dr.Ahmad", 1234, "Dental");
+		System.out.println(hospital_1.toString());
+		hospital_2.setHospitalName("New Hope Care");
+
+		System.out.println(
+				"The patient from a file: \n" + hospital_1.readFile(new File("/Users/esra/Documents/projectFile.txt")));
+
+		Patient patient_1 = new Patient("Esraa", 19, 12345, "esra@gmail.com", 50, 160, "A+");
+		Patient patient_2 = new Patient("Aryaf", 19, 12345, "Aryaf@gmail.com", 45, 160, "A+");
+		Patient patient_3 = new Patient("Rana", 19, 12345, "Rana@egmail.com", 45, 160, "A+");
+
+		System.out.print("Patient " + patient_1.getName() + " " + "is ");
+		patient_1.calculateTotalBMI(patient_1.getWeight(), patient_1.getHeight());
 
 		Medicine medicine_1 = new Medicine("Ibuprofen", 19);
 		Medicine medicine_2 = new Medicine("Panadol Night", 12);
@@ -18,52 +29,73 @@ public class test {
 		Appointment appointment_1 = new Appointment(2324);
 		Appointment appointment_2 = new Appointment(9668);
 
-		Nurse nurse_1 = new Nurse("From 9AM to 5PM");
-		Nurse nurse_2 = new Nurse("From 5PM to 9AM");
+		Nurse nurse_1 = new Nurse("Nurse Abeer", "From 9AM to 5PM");
+		Nurse nurse_2 = new Nurse("Nurse Khaled", "From 5PM to 9AM");
 
-		Patient[] patientObjects = new Patient[5];
-		patientObjects[0] = new Patient("Esraa", 19, 12345, "esra@gmail.com", 45, 160, "A+");
-		patientObjects[1] = new Patient("Aryaf", 19, 12345, "Aryaf@gmail.com", 45, 160, "A+");
-		patientObjects[2] = new Patient("Rana", 19, 12345, "Rana@egmail.com", 45, 160, "A+");
-		patientObjects[3] = new Patient("Ali", 30, 12345, "Ali@egmail.com", 70, 160, "O+");
-		patientObjects[4] = new Patient("Wafaa", 10, 12345, "Wafaa@egmail.com", 45, 150, "B+");
+		Doctor[] doctorObjects = new Doctor[5];
+		doctorObjects[0] = new Doctor("dr.Sara", 2234, "Eyes");
+		doctorObjects[1] = new Doctor("dr.Ahmad", 1234, "Dental");
+		doctorObjects[2] = new Doctor("dr.Muhammad", 4345, "Dermatology");
+		doctorObjects[3] = new Doctor("dr.Salma", 9876, "Surgery");
+		doctorObjects[4] = new Doctor("dr.Wafaa", 3454, "Neurology");
 
-		ArrayList<Object> patientList = new ArrayList<Object>();
-		hospital_1.fillArrayOfPatients(patientList, patientObjects);
+		System.out.println(medicine_1.prescribe(patient_3, doctorObjects[3], medicine_1));
+		System.out.println(medicine_2.prescribe(patient_2, doctorObjects[1], medicine_2));
+
+		System.out.println("\nThe available doctors list: ");
+
+		ArrayList<Object> doctorList = new ArrayList<Object>();
+		hospital_1.fillArrayOfDoctors(doctorList, doctorObjects);
 
 		Patient[] patients = new Patient[10];
 		Scanner read = new Scanner(System.in);
-		int choice;
-		
+		int choice = 0;
+        int count = 0;
 		do {
+			System.out.println();
 			System.out.println("To add patients, please enter 1.");
 			System.out.println("To delete  patients, please enter 2.");
 			System.out.println("To compare patients, please enter 3.");
 			System.out.println("To get the number of patient objects, please enter 4.");
 			System.out.println("To generate a system report, please enter 5.");
 			System.out.println("To exit the program, please enter 0.");
-			choice = read.nextInt();
 
-			switch (choice) {
-			case 1:
-				hospital_1.addPatient(patients);
-				break;
-			case 2:
+			try {
+				choice = read.nextInt();
+				switch (choice) {
+				case 1:
+					hospital_1.addPatient(patients);
+					count++;
+					break;
+				case 2:
 					hospital_1.deletePatient(patients);
-				break;
-			case 3:
-				hospital_1.equal(patients);
-				break;
-			case 4:
-				System.out.println("The number of Patient patient objects is: "+Patient.getNumberOfPatienObjects());
-				break;
-			case 5:
-				hospital_1.Display();
-				break;
-			default:
-				System.out.println("The program Ended.");
+					count++;
+					break;
+				case 3:
+					if (hospital_1.equal(patients)) {
+						System.out.println("The two patients are the same");
+					} else
+						System.out.println("The two patients are not the same");
+					count++;
+					break;
+				case 4:
+					System.out
+							.println("The number of Patient objects is: " + Patient.getNumberOfPatienObjects());
+					count++;
+					break;
+				case 5:
+					hospital_1.Display(count);
+					count++;
+					break;
+				case 0:
+					System.out.println("The program Ended.");
+					break;
+				default:
+					System.out.println("Please choose an option from 0 to 5 only.");
+				}
+			} catch (InputMismatchException e) {
+				System.out.println("Please choose an option from 0 to 5 only.");
 			}
-
 		} while (choice != 0);
 
 	}
@@ -87,45 +119,63 @@ class Hospital {
 		Scanner read = new Scanner(System.in);
 		System.out.println("Please enter the patient's information: "
 				+ "name, age, id, email, weight, height ,and bloodType seperated by a comma.");
+		System.out.println("This is currently the patient list: ");
 		for (int i = 0; i < patient.length; i++) {
-			System.out.println("Before: "+patient[i]);
+			System.out.println(i + " " + patient[i]);
 		}
 		String info = read.nextLine();
 		String[] infoArray = info.split(",");
-	    Patient newPatient = new Patient(
-	            infoArray[0].trim(),
-	            Integer.parseInt(infoArray[1].trim()),
-	            Integer.parseInt(infoArray[2].trim()),
-	            infoArray[3].trim(),
-	            Double.parseDouble(infoArray[4].trim()),
-	            Double.parseDouble(infoArray[5].trim()),
-	            infoArray[6].trim());
-		
-	    for (int i = 0; i < patient.length; i++) {
-	        if (patient[i] == null) {
-	            patient[i] = newPatient;
-	            break;
-	        }
-	    }
-	    System.out.println("Patient " + newPatient.getName() + " has been added.");
+		Patient newPatient = new Patient(infoArray[0].trim(), Integer.parseInt(infoArray[1].trim()),
+				Integer.parseInt(infoArray[2].trim()), infoArray[3].trim(), Double.parseDouble(infoArray[4].trim()),
+				Double.parseDouble(infoArray[5].trim()), infoArray[6].trim());
+
+		for (int i = 0; i < patient.length; i++) {
+			if (patient[i] == null) {
+				patient[i] = newPatient;
+				break;
+			}
+		}
+		System.out.println("Patient " + newPatient.getName() + " has been added.");
 	}
-	
+
+	public Patient readFile(File file) throws IOException {
+		Scanner input = new Scanner(file);
+		String patientFile = null;
+		Patient newPatient = null;
+
+		while (input.hasNext()) {
+			patientFile = input.nextLine();
+		}
+		input.close();
+		try {
+			String[] infoArray = patientFile.split(",");
+			newPatient = new Patient(infoArray[0].trim(), Integer.parseInt(infoArray[1].trim()),
+					Integer.parseInt(infoArray[2].trim()), infoArray[3].trim(), Double.parseDouble(infoArray[4].trim()),
+					Double.parseDouble(infoArray[5].trim()), infoArray[6].trim());
+			return newPatient;
+		} catch (Exception e) {
+			System.out.println("Check again, there is a problem with your inputs.");
+		}
+		return newPatient;
+
+	}
+
 	public void deletePatient(Patient[] patients) {
 		Scanner read = new Scanner(System.in);
 		System.out.println("This is currently the patient list: ");
 		for (int i = 0; i < patients.length; i++) {
 			System.out.println(i + " " + patients[i]);
 		}
-		
+
 		System.out.println("Enter the number of the patient to remove: ");
 		int index = read.nextInt();
-		
+
 		for (int i = index; i < patients.length - 1; i++) {
-            patients[i] = patients[i + 1];
-        }
-        patients[patients.length - 1] = null;
-    
-	    System.out.println("The patient has been deleted"); 
+			patients[i] = patients[i + 1];
+		}
+		patients[patients.length - 1] = null;
+
+		System.out.println("The patient has been deleted");
 	}
 
 	public String getHospitalName() {
@@ -166,8 +216,29 @@ class Hospital {
 		return false;
 	}
 
-	public void Display() {
-
+	public void Display(int count) {
+		Scanner read = new Scanner(System.in);
+		int rating=0;
+		System.out.println();
+		System.out.println("-------------System Details-------------");
+		System.out.printf("%s",Hospital.getNumberOfHospitalObjects()+" patients has been added/deleted.\n");
+		System.out.printf("%s","You used "+ count + " options from the system.\n");
+		System.out.println();
+		System.out.println("Please rate your experience with us :)");
+		System.out.println("For Satisfied and happy, please enter 1");
+		System.out.println("For Slightly Satisfied, please enter 2");
+		System.out.println("For Neutral, please enter 3");
+		System.out.println("For Dissatisfied, please enter 4");
+		System.out.println("For Very Dissatisfied, please enter 5");
+		
+		rating= read.nextInt();
+        switch(rating) {
+        case 1:
+        case 2:
+        case 3:
+        case 4:
+        case 5: System.out.println("Thank you for your time!"); break;
+        }
 	}
 
 	@Override
@@ -175,18 +246,17 @@ class Hospital {
 		return "The HospitalName :" + hospitalName;
 	}
 
-	public void fillArrayOfPatients(ArrayList<Object> listPatient, Patient[] patientArr) {
-		for (Object obj : patientArr) {
-			listPatient.add(obj);
+	public void fillArrayOfDoctors(ArrayList<Object> listDoctor, Doctor[] doctorArr) {
+		for (Object obj : doctorArr) {
+			listDoctor.add(obj);
 		}
-		for (Object obj : listPatient) {
+		for (Object obj : listDoctor) {
 			System.out.println(obj);
 		}
 	}
 
 	public static int getNumberOfHospitalObjects() {
 		return numberOfHospitalObjects;
-
 	}
 
 }
@@ -198,10 +268,15 @@ interface Person {
 	static final String email = null;
 
 	abstract String getName();
+
 	abstract void setName(String name);
+
 	abstract int getID();
+
 	abstract void setID(int id);
+
 	abstract String getEmail();
+
 	abstract void setEmail(String email);
 }
 
@@ -468,31 +543,43 @@ class Doctor extends Staff {
 
 class Nurse extends Staff {
 
+	private String nurse_name;
 	private String shift_Schedule;
-    private static int numberOfNurseObjects = 0;
-    public Nurse(){
-    	numberOfNurseObjects++;
-    }
-    public Nurse(String shiftSchedule) {
-        this.shift_Schedule = shiftSchedule;
-        numberOfNurseObjects++;
-    }
+	private static int numberOfNurseObjects = 0;
 
-    public String getShiftSchedule() {
-        return shift_Schedule;
-    }
+	public Nurse() {
+		numberOfNurseObjects++;
+	}
 
-    public void setShiftSchedule(String shiftSchedule) {
-        this.shift_Schedule = shiftSchedule;
-    }
+	public Nurse(String name, String shiftSchedule) {
+		this.nurse_name = name;
+		this.shift_Schedule = shiftSchedule;
+		numberOfNurseObjects++;
+	}
 
-    public String toString() {
-        return "Shift Schedule: " + shift_Schedule;
-    }
+	public String getNurseName() {
+		return nurse_name;
+	}
 
-    public static int getNumberOfNurseObjects() {
-        return numberOfNurseObjects;
-    }
+	public void setNurseName(String nurse_name) {
+		this.nurse_name = nurse_name;
+	}
+
+	public String getShiftSchedule() {
+		return shift_Schedule;
+	}
+
+	public void setShiftSchedule(String shiftSchedule) {
+		this.shift_Schedule = shiftSchedule;
+	}
+
+	public String toString() {
+		return "The nurse's name is: " + getNurseName() + "Shift Schedule: " + shift_Schedule;
+	}
+
+	public static int getNumberOfNurseObjects() {
+		return numberOfNurseObjects;
+	}
 }
 
 class Medicine extends Doctor {
@@ -529,8 +616,9 @@ class Medicine extends Doctor {
 		this.medicine_cost = cost;
 	}
 
-	public String prescribe(Patient patient, Doctor dr) {
-		return "This is a prescription for: " + patient.getName() + "prescribed by dr." + dr.getDoctorName() + ".";
+	public String prescribe(Patient patient, Doctor dr, Medicine name) {
+		return "This is a prescription of " + name.getMedicineName() + " for: " + patient.getName() + " prescribed by "
+				+ dr.getDoctorName() + ".";
 
 	}
 
@@ -541,10 +629,10 @@ class Medicine extends Doctor {
 			return false;
 	}
 
-	public void printReceipt(String medName, Medicine pres, int cost, Doctor dr, Patient patientName) {
+	public void printReceipt(Medicine medName, Medicine pres, int cost, Doctor dr, Patient patientName) {
 		System.out.printf("%-10s %-10s %-10s %-10s %-10s", "Medicine name", "The prescription",
 				"The cost" + "The doctor" + "The patient");
-		System.out.printf("%-10s %-10s %-10d %-10s %-10s", this.medicine_name, pres.prescribe(patientName, dr),
+		System.out.printf("%-10s %-10s %-10d %-10s %-10s", this.medicine_name, pres.prescribe(patientName, dr, medName),
 				this.medicine_cost + dr.getDoctorName() + patientName.getName());
 
 	}
